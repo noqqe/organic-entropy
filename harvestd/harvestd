@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+HOST = "localhost"
+PORT = 4223
+
+TEMP_UID = "tfj"
+ACCE_UID = "v6Z"
+SOUND_UID = "voE"
+LIGHT = "xpa"
+
+from tinkerforge.ip_connection import IPConnection
+from tinkerforge.bricklet_temperature import BrickletTemperature
+from tinkerforge.bricklet_accelerometer import BrickletAccelerometer
+from tinkerforge.bricklet_sound_intensity import BrickletSoundIntensity
+
+
+
+if __name__ == "__main__":
+    ipcon = IPConnection() # Create IP connection
+    t = BrickletTemperature(TEMP_UID, ipcon) # Create device object
+
+    ipcon.connect(HOST, PORT) # Connect to brickd
+    # Don't use device before ipcon is connected
+
+    # Get current temperature (unit is °C/100)
+    temperature = t.get_temperature()
+    print("Temperature: " + str(temperature/100.0) + " °C")
+
+    raw_input("Press key to exit\n") # Use input() in Python 3
+    ipcon.disconnect()
+
