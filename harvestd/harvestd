@@ -7,26 +7,52 @@ PORT = 4223
 TEMP_UID = "tfj"
 ACCE_UID = "v6Z"
 SOUND_UID = "voE"
-LIGHT = "xpa"
+LIGHT_UID = "xpa"
 
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_temperature import BrickletTemperature
 from tinkerforge.bricklet_accelerometer import BrickletAccelerometer
 from tinkerforge.bricklet_sound_intensity import BrickletSoundIntensity
+from tinkerforge.bricklet_uv_light import BrickletUVLight
 
+def get_temperature(UID, HOST, PORT):
+    ipcon = IPConnection()
+    t = BrickletTemperature(UID, ipcon)
+    ipcon.connect(HOST, PORT)
+    temperature = t.get_temperature()
+    ipcon.disconnect()
+    print("Temperature: " + str(temperature/100.0) + " °C")
+
+def get_acceleration(UID, HOST, PORT):
+    ipcon = IPConnection()
+    a = BrickletAccelerometer(UID, ipcon)
+    ipcon.connect(HOST, PORT)
+    x, y, z = a.get_acceleration()
+    print("Acceleration[X]: " + str(x/1000.0) + " g")
+    print("Acceleration[Y]: " + str(y/1000.0) + " g")
+    print("Acceleration[Z]: " + str(z/1000.0) + " g")
+    ipcon.disconnect()
+
+def get_light(UID, HOST, PORT):
+    ipcon = IPConnection()
+    uvl = BrickletUVLight(UID, ipcon)
+    ipcon.connect(HOST, PORT)
+    uv_light = uvl.get_uv_light()
+    print("UV Light: " + str(uv_light) + " µW/cm²")
+    ipcon.disconnect()
+
+def get_sound(UID, HOST, PORT):
+    ipcon = IPConnection()
+    si = BrickletSoundIntensity(UID, ipcon)
+    ipcon.connect(HOST, PORT)
+    intensity = si.get_intensity()
+    print("Intensity: " + str(intensity))
+    ipcon.disconnect()
 
 
 if __name__ == "__main__":
-    ipcon = IPConnection() # Create IP connection
-    t = BrickletTemperature(TEMP_UID, ipcon) # Create device object
-
-    ipcon.connect(HOST, PORT) # Connect to brickd
-    # Don't use device before ipcon is connected
-
-    # Get current temperature (unit is °C/100)
-    temperature = t.get_temperature()
-    print("Temperature: " + str(temperature/100.0) + " °C")
-
-    raw_input("Press key to exit\n") # Use input() in Python 3
-    ipcon.disconnect()
-
+    while True:
+        get_temperature(TEMP_UID, HOST, PORT)
+        get_acceleration(ACCE_UID, HOST, PORT)
+        get_sound(SOUND_UID, HOST, PORT)
+        get_light(LIGHT_UID, HOST, PORT)
