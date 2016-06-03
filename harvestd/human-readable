@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Collect all the Entropy!
-
 HOST = "localhost"
 PORT = 4223
 
@@ -11,8 +9,6 @@ ACCE_UID = "v6Z"
 SOUND_UID = "voE"
 LIGHT_UID = "xpa"
 
-import sys
-import hashlib
 from tinkerforge.ip_connection import IPConnection
 from tinkerforge.bricklet_temperature import BrickletTemperature
 from tinkerforge.bricklet_accelerometer import BrickletAccelerometer
@@ -25,50 +21,36 @@ def get_temperature(UID, HOST, PORT):
     ipcon.connect(HOST, PORT)
     temperature = t.get_temperature()
     ipcon.disconnect()
-    return str(temperature/100.0)
+    print("Temperature: " + str(temperature/100.0) + " °C")
 
 def get_acceleration(UID, HOST, PORT):
     ipcon = IPConnection()
     a = BrickletAccelerometer(UID, ipcon)
     ipcon.connect(HOST, PORT)
-    # Have you ever tested that, qaunz?
     x, y, z = a.get_acceleration()
+    print("Acceleration: X(" + str(x/1000.0) + ") Y(" + str(y/1000.0) + ") Z(" + str(z/1000.0) + ")")
     ipcon.disconnect()
-    return str(x/1000.0) + str(y/1000.0) + str(z/1000.0)
 
 def get_light(UID, HOST, PORT):
-    # holy shit, with this code we get a real bad rating
-    # at codeclimate. we better dont include a badge.
     ipcon = IPConnection()
     uvl = BrickletUVLight(UID, ipcon)
     ipcon.connect(HOST, PORT)
     uv_light = uvl.get_uv_light()
+    print("UV Light: " + str(uv_light) + " µW/cm²")
     ipcon.disconnect()
-    return str(uv_light)
 
 def get_sound(UID, HOST, PORT):
     ipcon = IPConnection()
     si = BrickletSoundIntensity(UID, ipcon)
     ipcon.connect(HOST, PORT)
-    # its getting intense!
     intensity = si.get_intensity()
+    print("Sound Intensity: " + str(intensity))
     ipcon.disconnect()
-    return str(intensity)
 
 
 if __name__ == "__main__":
-
-    # while true loops ftw.
     while True:
-        t = get_temperature(TEMP_UID, HOST, PORT)
-        a = get_acceleration(ACCE_UID, HOST, PORT)
-        s = get_sound(SOUND_UID, HOST, PORT)
-        g = get_light(LIGHT_UID, HOST, PORT)
-
-        # Is hashing a good idea?
-        # nah.. nevermind.
-        hash = hashlib.md5(t + a + s + g)
-        print hash.hexdigest()
-
-
-
+        get_temperature(TEMP_UID, HOST, PORT)
+        get_acceleration(ACCE_UID, HOST, PORT)
+        get_sound(SOUND_UID, HOST, PORT)
+        get_light(LIGHT_UID, HOST, PORT)
